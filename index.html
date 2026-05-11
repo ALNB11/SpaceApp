@@ -3,8 +3,8 @@
   Proiect 10 - Cine este in spatiu? (Who is in Space?)
   Tehnologii Web - 2025/2026
   Echipa:
-    - Alina   : CSS styling, dark/light theme, star animation, responsive layout, ISS map modal
-    - Nicoleta : JavaScript logic (fetchData, fetchISS, renderTable, toggleSort), Jest tests, backend server.js
+    - Alina   : Backend (server.js) - configurare Express, rute API, functii testabile
+    - Nicoleta: Frontend (index.html) - interfata web, logica JS, stilizare CSS
 -->
 <html lang="ro">
 <head>
@@ -13,13 +13,13 @@
   <meta name="author" content="Alina, Nicoleta" />
   <meta name="description" content="Dashboard care afiseaza in timp real astronautii aflati in spatiu si pozitia ISS." />
   <title>Space Dashboard</title>
-
-  <!-- Alina: Leaflet CSS pentru harta ISS -->
+ 
+  <!-- Nicoleta: Leaflet CSS pentru harta ISS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
+ 
   <style>
     /* =============================================
-       Alina: Stiluri generale pentru body
+       Nicoleta: Stiluri generale pentru body
     ============================================= */
     body {
       font-family: Arial, sans-serif;
@@ -27,25 +27,25 @@
       transition: background 0.3s, color 0.3s;
       overflow-x: hidden;
     }
-
-    /* Alina: Tema intunecata (implicita) */
+ 
+    /* Nicoleta: Tema intunecata (implicita) */
     body.dark {
       background: #0b0f1a;
       color: white;
     }
-
-    /* Alina: Tema luminoasa */
+ 
+    /* Nicoleta: Tema luminoasa */
     body.light {
       background: #f5f5f5;
       color: #111;
     }
-
+ 
     h1 {
       text-align: center;
     }
-
+ 
     /* =============================================
-       Alina: Bara de controale (butoane + input)
+       Nicoleta: Bara de controale (butoane + input)
        Foloseste Flexbox pentru layout responsive
     ============================================= */
     .controls {
@@ -55,76 +55,76 @@
       gap: 10px;
       margin-bottom: 20px;
     }
-
+ 
     button,
     input[type="text"] {
       padding: 10px;
       border-radius: 5px;
       border: none;
     }
-
+ 
     button {
       background: #1f6feb;
       color: white;
       cursor: pointer;
     }
-
+ 
     button:hover {
       background: #1558c0;
     }
-
+ 
     /* =============================================
-       Alina: Stiluri tabel astronauti
+       Nicoleta: Stiluri tabel astronauti
     ============================================= */
     table {
       margin: auto;
       border-collapse: collapse;
       background: #1e1e1e;
     }
-
+ 
     body.light table {
       background: white;
     }
-
+ 
     th,
     td {
       padding: 10px;
       border: 1px solid #444;
       white-space: nowrap;
     }
-
+ 
     body.light th {
       background: #333;
       color: white;
     }
-
+ 
     body.dark th {
       background: #2c2c2c;
       color: white;
     }
-
-    /* Alina: Header de grup naveta (craft) */
+ 
+    /* Nicoleta: Header de grup naveta (craft) */
     .craft-header {
       font-weight: bold;
     }
-
+ 
     body.dark .craft-header {
       background: #333;
       color: white;
     }
-
+ 
     body.light .craft-header {
       background: #ddd;
       color: black;
     }
-
+ 
     .info {
       text-align: center;
       margin-bottom: 10px;
     }
-
+ 
     /* =============================================
-       Alina: Animatie stele in fundal
+       Nicoleta: Animatie stele in fundal
     ============================================= */
     .stars {
       position: fixed;
@@ -135,7 +135,7 @@
       z-index: -1;
       overflow: hidden;
     }
-
+ 
     .star {
       position: absolute;
       width: 2px;
@@ -145,14 +145,14 @@
       animation: float 6s linear infinite;
       opacity: 0.6;
     }
-
+ 
     @keyframes float {
       from { transform: translateY(0); }
       to   { transform: translateY(-100vh); }
     }
-
+ 
     /* =============================================
-       Alina: Modal pentru harta ISS (Leaflet)
+       Nicoleta: Modal pentru harta ISS (Leaflet)
     ============================================= */
     .modal {
       display: none;
@@ -166,7 +166,7 @@
       justify-content: center;
       align-items: center;
     }
-
+ 
     .modal-content {
       width: 80%;
       height: 80%;
@@ -175,12 +175,12 @@
       position: relative;
       overflow: hidden;
     }
-
+ 
     #map {
       width: 100%;
       height: 100%;
     }
-
+ 
     .close-btn {
       position: absolute;
       top: 10px;
@@ -196,43 +196,43 @@
       transition: background 0.2s;
       border: none;
     }
-
+ 
     .close-btn:hover {
       background: rgba(255, 255, 255, 0.2);
     }
-
+ 
     /* =============================================
-       Alina: Responsive - ecrane mici (sub 600px)
+       Nicoleta: Responsive - ecrane mici (sub 600px)
     ============================================= */
     @media (max-width: 600px) {
       .controls {
         flex-direction: column;
       }
-
+ 
       input[type="text"] {
         width: 100%;
       }
-
+ 
       table {
         width: 100%;
       }
     }
   </style>
 </head>
-
+ 
 <body class="dark">
-
-  <!-- Alina: Container animatie stele -->
+ 
+  <!-- Nicoleta: Container animatie stele -->
   <div class="stars" id="stars"></div>
-
+ 
   <h1>&#128640; Space Dashboard</h1>
-
+ 
   <!-- Nicoleta: Zona de informatii dinamice (populate prin JS) -->
   <p id="count" class="info"></p>
   <p id="extra-info" class="info"></p>
   <p id="iss-location" class="info"></p>
-
-  <!-- Alina: Controale principale -->
+ 
+  <!-- Nicoleta: Controale principale -->
   <div class="controls">
     <button onclick="toggleSort()">Sort A-Z / Z-A</button>
     <button onclick="refreshData()">Refresh</button>
@@ -240,7 +240,7 @@
     <button onclick="openMap()">See ISS Map</button>
     <input type="text" id="search" placeholder="Search astronaut..." oninput="renderTable()" />
   </div>
-
+ 
   <!-- Nicoleta: Tabelul astronautilor, populat dinamic -->
   <table>
     <thead>
@@ -251,18 +251,18 @@
     </thead>
     <tbody id="table-body"></tbody>
   </table>
-
-  <!-- Alina: Modal harta ISS -->
+ 
+  <!-- Nicoleta: Modal harta ISS -->
   <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="ISS Map">
     <div class="modal-content">
       <button class="close-btn" onclick="closeMap()" aria-label="Close map">&#10006;</button>
       <div id="map"></div>
     </div>
   </div>
-
-  <!-- Alina: Leaflet JS pentru harta -->
+ 
+  <!-- Nicoleta: Leaflet JS pentru harta -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+ 
   <script>
     /*
      * Nicoleta: Variabile globale de stare
@@ -275,10 +275,10 @@
     let ascending = true;
     let map = null;
     let marker = null;
-
+ 
     /*
      * Nicoleta: fetchData()
-     * Preia datele despre astronauti din backend-ul local (/api/astros)
+     * Preia datele despre astronauti din backend (/api/astros)
      * si apeleaza fetchISS() pentru pozitia statiei spatiale.
      * Datele nu sunt stocate local (Cache-Control: no-store pe server).
      */
@@ -287,22 +287,22 @@
         .then(function(r) { return r.json(); })
         .then(function(data) {
           peopleData = data.people;
-
+ 
           document.getElementById("count").innerText =
             "There are " + data.number + " people in space right now.";
-
+ 
           document.getElementById("extra-info").innerText =
             "Last updated: " + new Date().toLocaleTimeString();
-
+ 
           renderTable();
         })
         .catch(function() {
           document.getElementById("count").innerText = "Error: could not reach the API.";
         });
-
+ 
       fetchISS();
     }
-
+ 
     /*
      * Nicoleta: fetchISS()
      * Preia pozitia curenta a ISS (latitudine, longitudine) din /api/iss
@@ -314,10 +314,10 @@
         .then(function(data) {
           var lat = data.iss_position.latitude;
           var lon = data.iss_position.longitude;
-
+ 
           document.getElementById("iss-location").innerText =
             "ISS position \u2192 Lat: " + lat + " | Lon: " + lon;
-
+ 
           if (map) {
             map.setView([lat, lon], 3);
             marker.setLatLng([lat, lon]);
@@ -327,7 +327,7 @@
           document.getElementById("iss-location").innerText = "ISS position unavailable.";
         });
     }
-
+ 
     /*
      * Nicoleta: renderTable()
      * Filtreaza astronautii dupa textul din campul de cautare,
@@ -342,51 +342,51 @@
     function renderTable() {
       var tbody = document.getElementById("table-body");
       var search = document.getElementById("search").value.toLowerCase();
-
+ 
       tbody.innerHTML = "";
-
-      /* Filtrare dupa numele astronautului (case-insensitive) */
+ 
+      /* Nicoleta: Filtrare dupa numele astronautului (case-insensitive) */
       var filtered = peopleData.filter(function(p) {
         return p.name.toLowerCase().indexOf(search) !== -1;
       });
-
-      /* Sortare alfabetica cu localeCompare (gestioneaza corect spatiile in nume) */
+ 
+      /* Nicoleta: Sortare alfabetica cu localeCompare (gestioneaza corect spatiile in nume) */
       filtered.sort(function(a, b) {
         return ascending
           ? a.name.localeCompare(b.name)
           : b.name.localeCompare(a.name);
       });
-
-      /* Grupare dupa naveta */
+ 
+      /* Nicoleta: Grupare dupa naveta */
       var grouped = {};
       filtered.forEach(function(p) {
         if (!grouped[p.craft]) grouped[p.craft] = [];
         grouped[p.craft].push(p.name);
       });
-
-      /* Construire randuri tabel */
+ 
+      /* Nicoleta: Construire randuri tabel */
       for (var craft in grouped) {
         var header = document.createElement("tr");
         header.classList.add("craft-header");
         header.innerHTML =
           "<td colspan=\"2\">" + craft + " (" + grouped[craft].length + ")</td>";
         tbody.appendChild(header);
-
+ 
         grouped[craft].forEach(function(name) {
           var row = document.createElement("tr");
           row.innerHTML = "<td></td><td>" + name + "</td>";
           tbody.appendChild(row);
         });
       }
-
-      /* Mesaj daca nu exista rezultate */
+ 
+      /* Nicoleta: Mesaj daca nu exista rezultate */
       if (filtered.length === 0) {
         var empty = document.createElement("tr");
         empty.innerHTML = "<td colspan=\"2\">No astronauts found.</td>";
         tbody.appendChild(empty);
       }
     }
-
+ 
     /*
      * Nicoleta: toggleSort()
      * Comuta directia sortarii si re-randeaza tabelul.
@@ -395,7 +395,7 @@
       ascending = !ascending;
       renderTable();
     }
-
+ 
     /*
      * Nicoleta: refreshData()
      * Reincarca datele live din API.
@@ -403,53 +403,53 @@
     function refreshData() {
       fetchData();
     }
-
+ 
     /*
-     * Alina: toggleTheme()
+     * Nicoleta: toggleTheme()
      * Comuta intre tema dark si tema light pe elementul body.
      */
     function toggleTheme() {
       document.body.classList.toggle("dark");
       document.body.classList.toggle("light");
     }
-
+ 
     /*
-     * Alina: openMap()
+     * Nicoleta: openMap()
      * Deschide modalul cu harta Leaflet.
      * Harta este initializata o singura data (lazy init) pentru performanta.
      */
     function openMap() {
       document.getElementById("modal").style.display = "flex";
-
+ 
       if (!map) {
         map = L.map("map").setView([0, 0], 2);
-
+ 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution: "\u00a9 OpenStreetMap contributors"
         }).addTo(map);
-
+ 
         marker = L.marker([0, 0]).addTo(map);
       }
-
+ 
       fetchISS();
     }
-
+ 
     /*
-     * Alina: closeMap()
+     * Nicoleta: closeMap()
      * Ascunde modalul cu harta.
      */
     function closeMap() {
       document.getElementById("modal").style.display = "none";
     }
-
+ 
     /*
-     * Alina: createStars()
+     * Nicoleta: createStars()
      * Genereaza dinamic 80 de elemente .star pentru animatia de fundal.
      * Pozitia si durata animatiei sunt aleatorii.
      */
     function createStars() {
       var container = document.getElementById("stars");
-
+ 
       for (var i = 0; i < 80; i++) {
         var star = document.createElement("div");
         star.className = "star";
@@ -459,11 +459,11 @@
         container.appendChild(star);
       }
     }
-
-    /* Initializare la incarcarea paginii */
+ 
+    /* Nicoleta: Initializare la incarcarea paginii */
     createStars();
     fetchData();
   </script>
-
+ 
 </body>
 </html>
