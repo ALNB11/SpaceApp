@@ -283,7 +283,7 @@
      * Datele nu sunt stocate local (Cache-Control: no-store pe server).
      */
     function fetchData() {
-      fetch("http://localhost:5000/api/astros")
+      fetch("https://space-app-backend-xsb0.onrender.com/api/astros")
         .then(function(r) { return r.json(); })
         .then(function(data) {
           peopleData = data.people;
@@ -309,7 +309,7 @@
      * si actualizeaza textul si marker-ul de pe harta daca aceasta e deschisa.
      */
     function fetchISS() {
-      fetch("http://localhost:5000/api/iss")
+      fetch("https://space-app-backend-xsb0.onrender.com/api/iss")
         .then(function(r) { return r.json(); })
         .then(function(data) {
           var lat = data.iss_position.latitude;
